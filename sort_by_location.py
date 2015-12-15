@@ -1,6 +1,6 @@
 __author__ = 'Guoliang Lin'
-Softwarename = 'splitGFF'
-version = '1.0.2'
+Softwarename = 'sort_by_location'
+version = '1.0.1'
 data=""
 bugfixs = ''
 import sys, getopt
@@ -18,36 +18,36 @@ def trim(y):
     return y
 
 
-def set_to_type(list_item, file,string,genestring,list_type):
-    """
-
-    :param listitem:listitem
-    :param file:file intergenic or intron
-    """
-    list_item[2] = string
-    list_item[3] = str(int(list_type[-2][1]) + 1)
-    list_item[4] = str(int(list_type[-1][0]) - 1)
-    list_item[-1] = genestring
-    file.write(trim(str(list_item)))
-def convert_to_type(list_item,list_type,file,string,genestring):
-    """
-
-    :param list_item: listitem
-    :param list_type: ExonsList or GeneList
-    :param file: file intergenic or intron
-    """
-    tmp=list_item[3:5]
-    list_type.append(tmp)
-    if len(list_type)>2:
-        list_type.pop(0)
-        set_to_type(list_item,file,string,genestring,list_type)
-    elif len(list_type)==2:
-        set_to_type(list_item,file,string,genestring,list_type)
-ExonsList= []
-GenesList=[]
-scaffold=''
-gene=''
-genelist=[]
+# def set_to_type(list_item, file,string,genestring,list_type):
+#     """
+#
+#     :param listitem:listitem
+#     :param file:file intergenic or intron
+#     """
+#     list_item[2] = string
+#     list_item[3] = str(int(list_type[-2][1]) + 1)
+#     list_item[4] = str(int(list_type[-1][0]) - 1)
+#     list_item[-1] = genestring
+#     file.write(trim(str(list_item)))
+# def convert_to_type(list_item,list_type,file,string,genestring):
+#     """
+#
+#     :param list_item: listitem
+#     :param list_type: ExonsList or GeneList
+#     :param file: file intergenic or intron
+#     """
+#     tmp=list_item[3:5]
+#     list_type.append(tmp)
+#     if len(list_type)>2:
+#         list_type.pop(0)
+#         set_to_type(list_item,file,string,genestring,list_type)
+#     elif len(list_type)==2:
+#         set_to_type(list_item,file,string,genestring,list_type)
+# ExonsList= []
+# GenesList=[]
+# scaffold=''
+# gene=''
+# genelist=[]
 print('%s software version is %s' % (Softwarename, version))
 print(bugfixs)
 print('starts at :' + time.strftime('%Y-%m-%d %H:%M:%S'))
