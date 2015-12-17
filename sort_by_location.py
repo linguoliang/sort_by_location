@@ -4,7 +4,6 @@ version = '1.0.1'
 data = ""
 bugfixs = ''
 
-from multiprocessing import Pool
 import sys, getopt
 import time
 
@@ -27,7 +26,7 @@ def trim_head(file, line=1):
         file.readline()
 
 
-def POSdetect(POS1, POS2) -> int:
+def POSdetect(POS1, POS2):
     """
     :param POS1:
     :param POS2:
@@ -41,9 +40,11 @@ def POSdetect(POS1, POS2) -> int:
         return int(POS2)
 
 
-def GetBase(ALT1, ALT2) -> str:
+def GetBase(ALT1, ALT2):
     """
 
+
+    :param ref:
     :param ALT1:
     :param ALT2:
     :return:
@@ -55,20 +56,6 @@ def GetBase(ALT1, ALT2) -> str:
         return ALT1
     else:
         return ALT2
-
-
-def IsDNAVar(ALT1) -> bool:
-    """
-
-    :param ALT1:
-    :return:
-    :rtype: bool
-    """
-    if ALT1.find('.') == -1:
-        return True
-    else:
-        return False
-
 
 def is_contain(x, segment):
     """
@@ -86,29 +73,10 @@ def is_contain(x, segment):
         return False
 
 
-def typedet(listrefaalt):
-    if IsDNAVar(listrefaalt[2]):
-        return GetBase(listrefaalt[2], listrefaalt[3]) + "->" + GetBase(listrefaalt[0], listrefaalt[1])
-    else:
-        return GetBase(listrefaalt[0], listrefaalt[1])+"->"+GetBase(listrefaalt[2], listrefaalt[3])
+def typedet(listrefaalt,ref):
+    return GetBase(listrefaalt[0], ref) + "->" + GetBase(listrefaalt[1], ref)
 
-def mapwrite(item):
-    item=item.replace('\n', '')
-    snplist = item.split("\t")
-    if snplist[0] in SegmentDict.keys():
-        listseg = SegmentDict[snplist[0]]
-        for element in listseg:
-            if is_contain(POSdetect(snplist[1], snplist[2]), element):
-                if -1 == snplist[6].find(snplist[7]):
-                    snplist.append(typedet(snplist[4:8]))
-                    if snplist[-1] in TypeDict.keys():
-                        TypeDict[snplist[-1]] = TypeDict[snplist[-1]] + 1
-                    else:
-                        TypeDict[snplist[-1]] = 1
-                    snpoutfile.write(trim(str(snplist)))
-                    global Total
-                    Total = Total + 1
-                break;
+
 
 print('%s software version is %s' % (Softwarename, version))
 print(bugfixs)
@@ -116,6 +84,7 @@ print('starts at :' + time.strftime('%Y-%m-%d %H:%M:%S'))
 
 SegmentDict = {}
 TypeDict = {}
+snplist1=[]
 Total = 0
 opts, args = getopt.getopt(sys.argv[1:], 'i:s:h', ['inputfile=', 'snp=', 'help'])
 InputFileName = ''
@@ -126,7 +95,6 @@ for o, a in opts:
         snp = a
     elif o in ['-h', '--help']:
         help = True
-pool=Pool(4)
 with open(InputFileName, 'r') as InputFile:
     with open(snp, 'r') as snpfile:
         with open(InputFileName.split(".")[0] + ".diff-filter.out", 'w') as snpoutfile:
@@ -141,7 +109,28 @@ with open(InputFileName, 'r') as InputFile:
                     else:
                         SegmentDict[segmentlist[0]] = []
                         SegmentDict[segmentlist[0]].append(segmentlist[1:3])
-                pool.map(mapwrite,snpfile)
+                for item in snpfile:
+                    item=item.replace('\n', '')
+                    snplist = item.split("\t")
+                #     snplist1.append(snplist)
+                # for snplist in snplist1:
+                    if snplist[0] in SegmentDict.keys():
+                        listseg = SegmentDict[snplist[0]]
+                        for element in listseg:
+                            if is_contain(POSdetect(snplist[1], snplist[2]), element):
+                                tmplist=list(snplist[6])
+                                tmplist.reverse()
+                                if snplist[6]==snplist[7] or ''.join(tmplist)==snplist[7]:
+                                    pass
+                                else:
+                                    snplist.append(typedet(snplist[6:8],GetBase(snplist[4],snplist[5])))
+                                    if snplist[-1] in TypeDict.keys():
+                                        TypeDict[snplist[-1]] = TypeDict[snplist[-1]] + 1
+                                    else:
+                                        TypeDict[snplist[-1]] = 1
+                                    snpoutfile.write(trim(str(snplist)))
+                                    Total = Total + 1
+                                break;
                 for key in TypeDict.keys():
                     statistic.write(key + '\t' + str(TypeDict[key]) + '\t' + str(Total) + '\t' + str(
                         TypeDict * 100.0 / Total) + '\n')
