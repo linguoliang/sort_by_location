@@ -1,6 +1,6 @@
 __author__ = 'Guoliang Lin'
 Softwarename = 'sort_by_location'
-version = '1.0.1'
+version = '1.1.0'
 data = ""
 bugfixs = ''
 
