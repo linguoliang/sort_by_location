@@ -112,8 +112,8 @@ with open(InputFileName, 'r') as InputFile:
                 for item in snpfile:
                     item=item.replace('\n', '')
                     snplist = item.split("\t")
-                #     snplist1.append(snplist)
-                # for snplist in snplist1:
+                    snplist1.append(snplist)
+                for snplist in snplist1:
                     if snplist[0] in SegmentDict.keys():
                         listseg = SegmentDict[snplist[0]]
                         for element in listseg:
@@ -133,5 +133,5 @@ with open(InputFileName, 'r') as InputFile:
                                 break;
                 for key in TypeDict.keys():
                     statistic.write(key + '\t' + str(TypeDict[key]) + '\t' + str(Total) + '\t' + str(
-                        TypeDict * 100.0 / Total) + '\n')
+                        TypeDict[key] * 100.0 / Total) + '\n')
 print('starts at :' + time.strftime('%Y-%m-%d %H:%M:%S'))
