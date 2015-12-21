@@ -103,42 +103,46 @@ for o, a in opts:
 with open(InputFileName, 'r') as InputFile:
     with open(snp, 'r') as snpfile:
         with open(InputFileName.split(".")[0] + ".diff-filter.out", 'w') as snpoutfile:
-            with open("statistic.txt", 'w') as statistic:
-                statistic.write("Tpye\tNO.\tTotal\tRate\n")
-                snpoutfile.write("CHROM\tPOS1\tPOS2\tIN_FILE\tREF1\tREF2\tALT1\tALT2\tTYPE\n")
-                trim_head(InputFile)
-                for item in InputFile:
-                    segmentlist = item.split("\t")
-                    if segmentlist[0] in SegmentDict.keys():
-                        SegmentDict[segmentlist[0]].append(segmentlist[1:3])
-                    else:
-                        SegmentDict[segmentlist[0]] = []
-                        SegmentDict[segmentlist[0]].append(segmentlist[1:3])
-                for item in snpfile:
-                    item=item.replace('\n', '')
-                    snplist = item.split("\t")
-                    if snplist[0] in SegmentDict.keys():
-                        SegmentDict[snplist[0]].append(snplist[1:])
-                for keys in SegmentDict.keys():
-                    SegmentDict[keys].sort(key=f)
-                    end=0
-                    for snplist in SegmentDict[keys]:
-                        if len(snplist)==2:
-                            end=int(snplist[1])
-                        elif POSdetect(snplist[0],snplist[1])<end:
-                            tmplist=list(snplist[5])
-                            tmplist.reverse()
-                            if snplist[5]==snplist[6] or ''.join(tmplist)==snplist[6]:
-                                pass
-                            else:
-                                snplist.append(typedet(snplist[5:7],GetBase(snplist[3],snplist[4])))
-                                if snplist[-1] in TypeDict.keys():
-                                    TypeDict[snplist[-1]] = TypeDict[snplist[-1]] + 1
+            with open(InputFileName.split(".")[0] + ".multivariation.out", 'w') as multiv:
+                with open("statistic.txt", 'w') as statistic:
+                    statistic.write("Tpye\tNO.\tTotal\tRate\n")
+                    snpoutfile.write("CHROM\tPOS1\tPOS2\tIN_FILE\tREF1\tREF2\tALT1\tALT2\tTYPE\n")
+                    trim_head(InputFile)
+                    for item in InputFile:
+                        segmentlist = item.split("\t")
+                        if segmentlist[0] in SegmentDict.keys():
+                            SegmentDict[segmentlist[0]].append(segmentlist[1:3])
+                        else:
+                            SegmentDict[segmentlist[0]] = []
+                            SegmentDict[segmentlist[0]].append(segmentlist[1:3])
+                    for item in snpfile:
+                        item=item.replace('\n', '')
+                        snplist = item.split("\t")
+                        if snplist[0] in SegmentDict.keys():
+                            SegmentDict[snplist[0]].append(snplist[1:])
+                    for keys in SegmentDict.keys():
+                        SegmentDict[keys].sort(key=f)
+                        end=0
+                        for snplist in SegmentDict[keys]:
+                            if len(snplist)==2:
+                                end=int(snplist[1])
+                            elif POSdetect(snplist[0],snplist[1])<end:
+                                tmplist=list(snplist[5])
+                                tmplist.reverse()
+                                if snplist[5]==snplist[6] or ''.join(tmplist)==snplist[6]:
+                                    pass
                                 else:
-                                    TypeDict[snplist[-1]] = 1
-                                snpoutfile.write(keys+'\t'+trim(str(snplist)))
-                                Total = Total + 1
-                for key in TypeDict.keys():
-                    statistic.write(key + '\t' + str(TypeDict[key]) + '\t' + str(Total) + '\t' + str(
-                        TypeDict[key] * 100.0 / Total) + '\n')
+                                    snplist.append(typedet(snplist[5:7],GetBase(snplist[3],snplist[4])))
+                                    if snplist[-1] in TypeDict.keys():
+                                        TypeDict[snplist[-1]] = TypeDict[snplist[-1]] + 1
+                                    else:
+                                        TypeDict[snplist[-1]] = 1
+                                    if len(snplist[-1])==4:
+                                        snpoutfile.write(keys+'\t'+trim(str(snplist)))
+                                    else:
+                                        multiv.write(keys+'\t'+trim(str(snplist)))
+                                    Total = Total + 1
+                    for key in TypeDict.keys():
+                        statistic.write(key + '\t' + str(TypeDict[key]) + '\t' + str(Total) + '\t' + str(
+                            TypeDict[key] * 100.0 / Total) + '\n')
 print('ends at :' + time.strftime('%Y-%m-%d %H:%M:%S'))
