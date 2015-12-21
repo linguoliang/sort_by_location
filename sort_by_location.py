@@ -1,6 +1,6 @@
 __author__ = 'Guoliang Lin'
-Softwarename = 'sort_by_location'
-version = '1.1.0'
+Softwarename = 'sort_by_location_quik_version'
+version = '2.0.1'
 data = ""
 bugfixs = ''
 
@@ -76,12 +76,17 @@ def is_contain(x, segment):
 def typedet(listrefaalt,ref):
     return GetBase(listrefaalt[0], ref) + "->" + GetBase(listrefaalt[1], ref)
 
+def f(a):
+    if len(a)==2:
+        return int(a[0])
+    else:
+        return POSdetect(a[0],a[1])
 
 
 print('%s software version is %s' % (Softwarename, version))
 print(bugfixs)
 print('starts at :' + time.strftime('%Y-%m-%d %H:%M:%S'))
-
+end=0
 SegmentDict = {}
 TypeDict = {}
 snplist1=[]
@@ -112,26 +117,28 @@ with open(InputFileName, 'r') as InputFile:
                 for item in snpfile:
                     item=item.replace('\n', '')
                     snplist = item.split("\t")
-                    snplist1.append(snplist)
-                for snplist in snplist1:
                     if snplist[0] in SegmentDict.keys():
-                        listseg = SegmentDict[snplist[0]]
-                        for element in listseg:
-                            if is_contain(POSdetect(snplist[1], snplist[2]), element):
-                                tmplist=list(snplist[6])
-                                tmplist.reverse()
-                                if snplist[6]==snplist[7] or ''.join(tmplist)==snplist[7]:
-                                    pass
+                        SegmentDict[snplist[0]].append(snplist[1:])
+                for keys in SegmentDict.keys():
+                    SegmentDict[keys].sort(key=f)
+                    end=0
+                    for snplist in SegmentDict[keys]:
+                        if len(snplist)==2:
+                            end=int(snplist[1])
+                        elif POSdetect(snplist[0],snplist[1])<end:
+                            tmplist=list(snplist[5])
+                            tmplist.reverse()
+                            if snplist[5]==snplist[6] or ''.join(tmplist)==snplist[6]:
+                                pass
+                            else:
+                                snplist.append(typedet(snplist[5:7],GetBase(snplist[3],snplist[4])))
+                                if snplist[-1] in TypeDict.keys():
+                                    TypeDict[snplist[-1]] = TypeDict[snplist[-1]] + 1
                                 else:
-                                    snplist.append(typedet(snplist[6:8],GetBase(snplist[4],snplist[5])))
-                                    if snplist[-1] in TypeDict.keys():
-                                        TypeDict[snplist[-1]] = TypeDict[snplist[-1]] + 1
-                                    else:
-                                        TypeDict[snplist[-1]] = 1
-                                    snpoutfile.write(trim(str(snplist)))
-                                    Total = Total + 1
-                                break;
+                                    TypeDict[snplist[-1]] = 1
+                                snpoutfile.write(keys+'\t'+trim(str(snplist)))
+                                Total = Total + 1
                 for key in TypeDict.keys():
                     statistic.write(key + '\t' + str(TypeDict[key]) + '\t' + str(Total) + '\t' + str(
                         TypeDict[key] * 100.0 / Total) + '\n')
-print('starts at :' + time.strftime('%Y-%m-%d %H:%M:%S'))
+print('ends at :' + time.strftime('%Y-%m-%d %H:%M:%S'))
