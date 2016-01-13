@@ -131,7 +131,7 @@ with open(InputFileName, 'r') as InputFile:
                             for snplist in SegmentDict[keys]:
                                 if len(snplist)==2:
                                     end=int(snplist[1])
-                                elif POSdetect(snplist[0],snplist[1])<end:
+                                elif POSdetect(snplist[0],snplist[1]) <= end:
                                     tmplist=list(snplist[5])
                                     tmplist.reverse()
                                     if snplist[5]==snplist[6] or ''.join(tmplist)==snplist[6]:
