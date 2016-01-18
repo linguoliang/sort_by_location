@@ -1,3 +1,4 @@
+#coding=utf-8
 __author__ = 'Guoliang Lin'
 Softwarename = 'sort_by_location_quik_version'
 version = '2.0.1'
@@ -95,7 +96,7 @@ Total = 0
 opts, args = getopt.getopt(sys.argv[1:], 'i:g:s:h', ['inputfile=','GFF=', 'snp=', 'help'])
 InputFileName = ''
 for o, a in opts:
-    if o in ['-i', '--inp,utfile']:
+    if o in ['-i', '--inputfile']:
         InputFileName = a
     elif o in ['-s', '--snp']:
         snp = a
