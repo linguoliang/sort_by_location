@@ -1,4 +1,7 @@
 #coding=utf-8
+"""
+参数  -i commomsegment.out -g fish.gff3 -s
+"""
 __author__ = 'Guoliang Lin'
 Softwarename = 'sort_by_location_quik_version'
 version = '2.0.1'
